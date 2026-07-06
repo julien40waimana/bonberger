@@ -1,0 +1,87 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<div style="padding: 30px; max-width: 650px; margin: 0 auto;">
+    <div style="background: white; border-radius: 16px; padding: 35px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05), 0 8px 10px -6px rgba(0,0,0,0.05);">
+        
+        <div style="text-align: center; margin-bottom: 30px;">
+            <h2 style="color: #0f172a; font-size: 24px; font-weight: 700; margin: 0 0 8px 0;"><i class="fas fa-user-edit" style="color: #1e3a8a; margin-right: 10px;"></i>Modifier mon Profil</h2>
+            <p style="color: #64748b; font-size: 14px; margin: 0;">Mettez à jour vos informations de connexion et votre image de marque.</p>
+        </div>
+        
+        <form method="POST" enctype="multipart/form-data" style="display: flex; flex-direction: column; gap: 22px;">
+            {% csrf_token %}
+            
+            <div style="display: flex; gap: 16px;">
+                <div style="flex: 1; display: flex; flex-direction: column; gap: 6px;">
+                    <label style="font-size: 13px; font-weight: 600; color: #475569;">Nom (Last name)</label>
+                    <input type="text" name="last_name" value="{{ form.last_name.value|default_if_none:'' }}" class="custom-form-input">
+                    {% if form.last_name.errors %}<span style="color: #dc2626; font-size: 12px;">{{ form.last_name.errors.0 }}</span>{% endif %}
+                </div>
+                
+                <div style="flex: 1; display: flex; flex-direction: column; gap: 6px;">
+                    <label style="font-size: 13px; font-weight: 600; color: #475569;">Prénom (First name)</label>
+                    <input type="text" name="first_name" value="{{ form.first_name.value|default_if_none:'' }}" class="custom-form-input">
+                    {% if form.first_name.errors %}<span style="color: #dc2626; font-size: 12px;">{{ form.first_name.errors.0 }}</span>{% endif %}
+                </div>
+            </div>
+            
+            <div style="display: flex; flex-direction: column; gap: 6px;">
+                <label style="font-size: 13px; font-weight: 600; color: #475569;">Adresse Email</label>
+                <input type="email" name="email" value="{{ form.email.value|default_if_none:'' }}" class="custom-form-input">
+                {% if form.email.errors %}<span style="color: #dc2626; font-size: 12px;">{{ form.email.errors.0 }}</span>{% endif %}
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 6px; background: #f8fafc; padding: 16px; border-radius: 10px; border: 1px dashed #cbd5e1;">
+                <label style="font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 4px;">Photo de profil</label>
+                
+                {% if request.user.photo_profil %}
+                    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+                        <img src="{{ request.user.photo_profil.url }}" style="width: 45px; height: 45px; border-radius: 50%; object-fit: cover; border: 2px solid #1e3a8a;">
+                        <span style="font-size: 12px; color: #64748b;">Fichier actuel : {{ form.photo_profil.value }}</span>
+                    </div>
+                {% endif %}
+                
+                <input type="file" name="photo_profil" accept="image/*" style="font-size: 13px; color: #64748b; width: 100%;">
+                {% if form.photo_profil.errors %}<span style="color: #dc2626; font-size: 12px;">{{ form.photo_profil.errors.0 }}</span>{% endif %}
+            </div>
+
+            <div style="display: flex; gap: 14px; margin-top: 10px;">
+                <a href="{% url 'dashboard_superadmin' %}" style="flex: 1; text-align: center; background: #f1f5f9; color: #475569; padding: 12px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 14px; transition: background 0.2s;">
+                    Annuler
+                </a>
+                <button type="submit" style="flex: 1; background: #1e3a8a; color: white; padding: 12px; border-radius: 8px; border: none; font-weight: 600; font-size: 14px; cursor: pointer; transition: background 0.2s; box-shadow: 0 4px 6px -1px rgba(30, 58, 138, 0.2);">
+                    Sauvegarder les modifications
+                </button>
+            </div>
+        </form>
+        
+    </div>
+</div>
+
+<style>
+    .custom-form-input {
+        width: 100%; 
+        padding: 11px 14px; 
+        border: 1px solid #cbd5e1; 
+        border-radius: 8px; 
+        font-size: 14px; 
+        color: #0f172a; 
+        background-color: #fff; 
+        box-sizing: border-box;
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .custom-form-input:focus {
+        outline: none;
+        border-color: #1e3a8a;
+        box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.1);
+    }
+</style>
+<script>
+    document.querySelectorAll('input, select, textarea').forEach(el => {
+        if(el.type !== 'checkbox' && el.type !== 'radio') {
+            el.style.cssText = "width: 100%; padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 14px; color: #0f172a; background-color: #fff; box-sizing: border-box;";
+        }
+    });
+</script>
+{% endblock %}

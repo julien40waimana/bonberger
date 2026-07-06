@@ -1,0 +1,111 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<style>
+    .compta-card { background: #fff3cd; border-left: 5px solid #ffc107; padding: 20px; border-radius: 8px; margin-bottom: 25px; }
+    .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; }
+    .modal-content { background: white; padding: 30px; border-radius: 12px; width: 450px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+    .form-group { margin-bottom: 15px; display: flex; flex-direction: column; gap: 5px; }
+    .form-group input { padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; }
+</style>
+
+<h2><i class="fas fa-calculator" style="color: var(--primary);"></i> Service de la Comptabilité — Bon Berger</h2>
+<p style="color: #64748b; margin-bottom: 25px;">Suivi des paiements des frais scolaires, gestion des créances et recouvrements.</p>
+
+<div class="compta-card">
+    <h4 style="color: #664d03; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px;">Fonds global restant à recouvrer</h4>
+    <p style="font-size: 28px; font-weight: bold; color: #664d03; margin-top: 5px;">{{ total_dettes }} USD</p>
+</div>
+
+<div class="card">
+    <h3><i class="fas fa-file-invoice-dollar"></i> États Financiers des Élèves</h3>
+    <div style="margin-top: 15px; overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 14px;">
+            <thead>
+                <tr style="background: #f1f5f9; border-bottom: 2px solid #cbd5e1;">
+                    <th style="padding: 12px;">Matricule</th>
+                    <th style="padding: 12px;">Nom Complet</th>
+                    <th style="padding: 12px;">Reste à Payer (Solde)</th>
+                    <th style="padding: 12px; text-align: center;">Statut</th>
+                    <th style="padding: 12px; text-align: center;">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for sit in situations %}
+                    <tr style="border-bottom: 1px solid #e2e8f0;">
+                        <td style="padding: 12px; font-family: monospace; font-weight: bold;">{{ sit.eleve.matricule|default:"-" }}</td>
+                        <td style="padding: 12px; font-weight: 500;">{{ sit.eleve.last_name }} {{ sit.eleve.first_name }}</td>
+                        <td style="padding: 12px; font-weight: bold; color: {% if sit.solde_financier > 0 %}#b91c1c{% else %}var(--success){% endif %};">
+                            {{ sit.solde_financier }} USD
+                        </td>
+                        <td style="padding: 12px; text-align: center;">
+                            {% if sit.solde_financier > 0 %}
+                                <span style="background: #fee2e2; color: #991b1b; padding: 3px 8px; border-radius: 4px; font-size: 12px; font-weight: bold;">Insolvable</span>
+                            {% else %}
+                                <span style="background: #d1fae5; color: #065f46; padding: 3px 8px; border-radius: 4px; font-size: 12px; font-weight: bold;">En Règle</span>
+                            {% endif %}
+                        </td>
+                        <td style="padding: 12px; text-align: center;">
+                            <button class="btn" style="padding: 6px 12px; font-size: 12px; background: var(--success);"
+                                onclick="ouvrirModalePaiement('{{ sit.id }}', '{{ sit.eleve.get_full_name|escapejs }}', '{{ sit.solde_financier }}')">
+                                <i class="fas fa-hand-holding-usd"></i> Encaisser
+                            </button>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="5" style="padding: 20px; text-align: center; color: #94a3b8; font-style: italic;">Aucune fiche financière disponible. Les élèves doivent d'abord être enregistrés à la réception.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div id="modalPaiement" class="modal">
+    <div class="modal-content">
+        <h3 style="margin-bottom: 15px;"><i class="fas fa-money-check-alt"></i> Encaisser un versement</h3>
+        <p style="font-size: 14px; color: #64748b; margin-bottom: 20px;">Élève : <strong id="modal_nom_eleve" style="color: var(--dark);"></strong></p>
+        
+        <form method="POST">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="recorded_paiement"> <input type="hidden" name="action" value="enregistrer_paiement">
+            <input type="hidden" name="situation_id" id="modal_situation_id">
+            
+            <div class="form-group">
+                <label>Dette Actuelle (USD)</label>
+                <input type="text" id="modal_solde_actuel" disabled style="background: #f1f5f9; font-weight: bold;">
+            </div>
+
+            <div class="form-group">
+                <label>Montant à verser (USD)</label>
+                <input type="number" name="montant" min="0.01" step="0.01" required placeholder="Ex: 150">
+            </div>
+            
+            <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 25px;">
+                <button type="button" class="btn" style="background: #cbd5e1; color: var(--dark);" onclick="fermerModale()">Annuler</button>
+                <button type="submit" class="btn"><i class="fas fa-university"></i> Valider le Versement</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    const modal = document.getElementById('modalPaiement');
+
+    function ouvrirModalePaiement(id, nomComplet, solde) {
+        document.getElementById('modal_situation_id').value = id;
+        document.getElementById('modal_nom_eleve').innerText = nomComplet;
+        document.getElementById('modal_solde_actuel').value = solde + " USD";
+        modal.style.display = 'flex';
+    }
+
+    function fermerModale() {
+        modal.style.display = 'none';
+    }
+
+    window.onclick = function(event) {
+        if (event.target == modal) { fermerModale(); }
+    }
+</script>
+{% endblock %}

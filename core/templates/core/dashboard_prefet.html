@@ -1,0 +1,21 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<h2>Fil des Notifications d'Activités</h2>
+<p style="color: #64748b; margin-bottom: 20px;">Suivi en temps réel des modifications de profils des utilisateurs.</p>
+
+<div class="card">
+    {% if notifications %}
+        <ul style="list-style: none;">
+            {% for notif in notifications %}
+                <li style="padding: 15px; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center;">
+                    <span><i class="fas fa-bell" style="color: #f59e0b; margin-right: 10px;"></i> {{ notif.message }}</span>
+                    <small style="color: #94a3b8;">{{ notif.cree_le|date:"d/m/Y H:i" }}</small>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p style="color: #94a3b8; font-style: italic;">Aucune notification pour le moment.</p>
+    {% endif %}
+</div>
+{% endblock %}

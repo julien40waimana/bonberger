@@ -1,0 +1,112 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<style>
+    .form-group { margin-bottom: 15px; display: flex; flex-direction: column; gap: 5px; }
+    .form-group input, .form-group select { padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 14px; }
+    
+    /* Barre de progression d'assiduité */
+    .progress-bar-container { background: #e2e8f0; border-radius: 10px; width: 100%; height: 12px; margin-top: 5px; overflow: hidden; }
+    .progress-bar-fill { background: var(--success); height: 100%; transition: width 0.5s ease-in-out; }
+    .status-alert { font-size: 11px; font-weight: bold; padding: 2px 6px; border-radius: 4px; color: white; }
+</style>
+
+<h2><i class="fas fa-user-graduate" style="color: var(--primary);"></i> Direction des Études — École Bon Berger</h2>
+<p style="color: #64748b; margin-bottom: 25px;">Gestion des attributions de cours, charges horaires et suivi de l'assiduité des enseignants.</p>
+
+<div class="grid" style="grid-template-columns: 1fr 2.2fr;">
+    
+    <!-- PANNEAU 1 : FORMULAIRE D'ATTRIBUTION -->
+    <div class="card">
+        <h3><i class="fas fa-plus-circle" style="color: var(--secondary);"></i> Attribuer un Cours</h3>
+        <form method="POST" style="margin-top: 15px;">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="attribuer_cours">
+            
+            <div class="form-group">
+                <label>Enseignant Responsable</label>
+                <select name="professeur_id" required>
+                    <option value="">-- Choisir un professeur --</option>
+                    {% for prof in professeurs %}
+                        <option value="{{ prof.id }}">Prof. {{ prof.last_name }} {{ prof.first_name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Nom de la Matière / Cours</label>
+                <input type="text" name="nom_cours" required placeholder="Ex: Mathématiques, Physique...">
+            </div>
+
+            <div class="form-group">
+                <label>Classe / Promotion</label>
+                <input type="text" name="classe" required placeholder="Ex: 4ème Année Humanités, 3ème CT">
+            </div>
+
+            <div class="form-group">
+                <label>Volume Horaire Global Requis</label>
+                <input type="number" name="heures_attribuees" min="1" required placeholder="Nombre total d'heures">
+            </div>
+
+            <button type="submit" class="btn" style="width: 100%;"><i class="fas fa-save"></i> Confirmer l'Attribution</button>
+        </form>
+    </div>
+
+    <!-- PANNEAU 2 : MONITEUR D'ASSIDUITÉ ET CHARGE HORAIRE -->
+    <div class="card">
+        <h3><i class="fas fa-chart-line" style="color: var(--primary);"></i> Suivi de l'Assiduité & Avancement des Cours</h3>
+        <div style="margin-top: 15px; overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 14px;">
+                <thead>
+                    <tr style="background: #f1f5f9; border-bottom: 2px solid #cbd5e1;">
+                        <th style="padding: 12px;">Enseignant</th>
+                        <th style="padding: 12px;">Cours & Classe</th>
+                        <th style="padding: 12px; text-align: center;">Heures (Faites/Prévues)</th>
+                        <th style="padding: 12px;">Progression / Assiduité</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for cours in tous_les_cours %}
+                        <tr style="border-bottom: 1px solid #e2e8f0;">
+                            <td style="padding: 12px;">
+                                <strong>Prof. {{ cours.professeur.last_name }}</strong><br>
+                                <small style="color: #64748b;">{{ cours.professeur.first_name }}</small>
+                            </td>
+                            <td style="padding: 12px;">
+                                <span style="font-weight: 600; color: var(--dark);">{{ cours.nom_cours }}</span><br>
+                                <small style="color: var(--secondary); font-weight: bold;">{{ cours.classe }}</small>
+                            </td>
+                            <td style="padding: 12px; text-align: center; font-weight: bold; font-size: 15px;">
+                                <span style="color: var(--success);">{{ cours.heures_effectuees }}h</span> / 
+                                <span style="color: var(--primary)">{{ cours.heures_attribuees }}h</span>
+                            </td>
+                            <td style="padding: 12px;">
+                                <div style="display: flex; justify-content: space-between; font-size: 12px;">
+                                    <span>Taux : {{ cours.progression_pourcentage }}%</span>
+                                    {% if cours.heures_effectuees == 0 %}
+                                        <span class="status-alert" style="background:#ef4444;">Absent / Non démarré</span>
+                                    {% elif cours.progression_pourcentage < 100 %}
+                                        <span class="status-alert" style="background:#f59e0b;">En Cours</span>
+                                    {% else %}
+                                        <span class="status-alert" style="background:var(--success);">Terminé</span>
+                                    {% endif %}
+                                </div>
+                                <div class="progress-bar-container">
+                                    <div class="progress-bar-fill" style="width: {{ cours.progression_pourcentage }}%;"></div>
+                                </div>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="4" style="padding: 30px; text-align: center; color: #94a3b8; font-style: italic;">
+                                Aucun cours n'a été attribué pour le moment. Utilisez le panneau latéral pour commencer.
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

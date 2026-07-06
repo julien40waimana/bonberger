@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bon Berger - Gestion Scolaire</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1e3a8a;
+            --secondary: #0284c7;
+            --dark: #0f172a;
+            --light: #f8fafc;
+            --success: #10b981;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { display: flex; background: var(--light); color: var(--dark); min-height: 100vh; }
+        
+        /* Sidebar */
+        nav { width: 260px; background: var(--primary); color: white; padding: 20px; display: flex; flex-direction: column; justify-content: space-between; }
+        nav .logo h2 { text-transform: uppercase; letter-spacing: 1px; font-size: 22px; margin-bottom: 30px; display: flex; align-items: center; gap: 10px; }
+        nav ul { list-style: none; }
+        nav ul li { margin-bottom: 15px; }
+        nav ul li a { color: #cbd5e1; text-decoration: none; display: flex; align-items: center; gap: 15px; padding: 12px; border-radius: 8px; transition: 0.3s; }
+        nav ul li a:hover, nav ul li a.active { background: var(--secondary); color: white; }
+        
+        /* Main Content */
+        main { flex: 1; padding: 40px; overflow-y: auto; }
+        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 2px solid #e2e8f0; padding-bottom: 20px; }
+        .user-badge { display: flex; align-items: center; gap: 15px; }
+        .user-badge img { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; border: 2px solid var(--secondary); }
+        
+        /* Cards & Components */
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-top: 20px; }
+        .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+        .btn { background: var(--secondary); color: white; border: none; padding: 10px 15px; border-radius: 6px; cursor: pointer; transition: 0.3s; text-decoration: none; }
+        .btn:hover { background: var(--primary); }
+        .alert { background: #d1fae5; color: #065f46; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+
+        {% comment %} pour les messages django {% endcomment %}
+        #floatingToastContainer {
+    position: fixed;
+    top: 25px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10000;
+    pointer-events: none;
+}
+
+/* Le rectangle de notification vert */
+#floatingToastContainer {
+    position: fixed;
+    top: 25px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10000;
+    pointer-events: none;
+}
+
+.floating-toast {
+    pointer-events: auto;
+    background: #e6f4ea; /* Fond vert clair */
+    color: #137333;      /* Texte vert foncé */
+    border: 1px solid #c4eed0;
+    padding: 14px 24px;
+    border-radius: 50px; /* Effet pilule / bulle flottante */
+    box-shadow: 0 10px 25px -5px rgba(19, 115, 51, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 14px;
+    font-weight: 500;
+    animation: slideAndFloatIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+@keyframes slideAndFloatIn {
+    0% {
+        transform: translateY(-60px) scale(0.9);
+        opacity: 0;
+    }
+    100% {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+    }
+}
+
+.floating-toast.leave {
+    animation: floatAwayUp 0.5s cubic-bezier(0.6, -0.28, 0.735, 0.045) forwards;
+}
+
+@keyframes floatAwayUp {
+    0% {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(-40px) scale(0.9);
+        opacity: 0;
+    }
+}
+    </style>
+    <div id="floatingToastContainer"></div>
+</head>
+<body>
+
+    <nav>
+        <div class="logo">
+            <h2><i class="fas fa-school"></i> Bon Berger</h2>
+            <ul>
+                <li><a href="{% url 'aiguillage' %}" class="active"><i class="fas fa-home"></i> Accueil</a></li>
+                <li><a href="{% url 'modifier_profil' %}"><i class="fas fa-user-edit"></i> Mon Profil</a></li>
+                <!-- À coller juste en dessous du lien "Mon Profil" -->
+               <li><a href="?q=eleve" style="display: flex; align-items: center; gap: 10px; padding: 12px 16px; color: #cbd5e1; text-decoration: none; font-size: 15px;">
+                <i class="fas fa-graduation-cap"></i> Liste des Élèves</a><li>
+                <li><a href="?filtre=admin" class="{% if request.GET.filtre == 'admin' %}active{% endif %}">
+                <i class="fas fa-user-shield"></i> Liste des Admins</a><li>
+              <form action="{% url 'logout' %}" method="POST" style="display: inline; margin: 0; padding: 0;">
+            {% csrf_token %}
+            <button type="submit" style="background: none; border: none; color: inherit; font: inherit; cursor: pointer; display: flex; align-items: center; gap: 10px; width: 100%; padding: 10px 15px; text-decoration: none;">
+                <i class="fas fa-sign-out-alt"></i> Déconnexion
+            </button>
+        </form>
+                    </ul>
+        </div>
+        <div>
+            <small>© 2026 Ecole Bon Berger</small>
+        </div>
+    </nav>
+
+    <main>
+        <header>
+            <div>
+                <h1>Tableau de Bord</h1>
+                <p>Bienvenue, {{ request.user.first_name }} {{ request.user.last_name }} (<strong>{{ request.user.get_role_display }}</strong>)</p>
+            </div>
+                    <div style="width: 60px; height: 60px; border-radius: 50%; overflow: hidden; border: 2px solid #cbd5e1; display: flex; align-items: center; justify-content: center;">
+                    {% if request.user.photo_profil %}
+                    <img src="{{ request.user.photo_profil.url }}" alt="Avatar" style="width: 100%; height: 100%; object-fit: cover;">
+                   {% else %}
+                     <div style="width: 100%; height: 100%; background: #1e3a8a; color: white; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 14px;">
+                    {{ request.user.first_name|slice:":1"|upper }}
+                </div>
+            {% endif %}
+        </div>
+        </header>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="django-message-data" 
+                    data-text="{{ message }}" 
+                    data-tags="{{ message.tags }}" 
+                    style="display: none;">
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <script>
+        // Effet JavaScript simple de confirmation au clic ou d'animation des alertes
+        document.addEventListener("DOMContentLoaded", function() {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                setTimeout(() => {
+                    alert.style.display = 'none';
+                }, 4000);
+            });
+        });
+        document.addEventListener("DOMContentLoaded", function() {
+    const messageElements = document.querySelectorAll('.django-message-data');
+    
+    messageElements.forEach(function(el) {
+        const messageText = el.getAttribute('data-text');
+        if (messageText) {
+            triggerFloatingToast(messageText);
+        }
+    });
+});
+
+function triggerFloatingToast(text) {
+    const container = document.getElementById('floatingToastContainer');
+    const toast = document.createElement('div');
+    toast.className = 'floating-toast';
+    
+    toast.innerHTML = `
+        <i class="fas fa-check-circle" style="font-size: 16px; color: #137333;"></i>
+        <span>${text}</span>
+    `;
+    
+    container.appendChild(toast);
+    
+    // Disparition en flottant vers le haut après 4 secondes
+    setTimeout(() => {
+        toast.classList.add('leave');
+        toast.addEventListener('animationend', function() {
+            toast.remove();
+        });
+    }, 4000);
+}
+    </script>
+</body>
+</html>

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connexion — École Bon Berger</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #1e3a8a;
+            --secondary: #0284c7;
+            --dark: #0f172a;
+            --light: #f8fafc;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background: #e2e8f0; display: flex; height: 100vh; justify-content: center; align-items: center; padding: 20px; }
+        .login-container { background: white; width: 100%; max-width: 450px; padding: 40px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border-top: 5px solid var(--primary); }
+        .logo-area { text-align: center; margin-bottom: 30px; }
+        .logo-area h1 { color: var(--dark); font-size: 26px; }
+        .logo-area p { color: #64748b; font-size: 14px; margin-top: 5px; }
+        .form-group { margin-bottom: 20px; position: relative; }
+        .form-group label { display: block; margin-bottom: 8px; color: #475569; font-size: 14px; font-weight: 600; }
+        .input-icon { position: absolute; left: 12px; top: 38px; color: #94a3b8; }
+        .form-group input { width: 100%; padding: 12px 12px 12px 40px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 15px; outline: none; transition: border 0.2s; }
+        .form-group input:focus { border-color: var(--secondary); box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.1); }
+        .btn-login { width: 100%; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; transition: background 0.2s; margin-top: 10px; }
+        .btn-login:hover { background: #172554; }
+        .alert { background: #fee2e2; border-left: 4px solid #ef4444; color: #991b1b; padding: 12px; border-radius: 6px; font-size: 14px; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+
+<div class="login-container">
+    <div class="logo-area">
+        <h1><i class="fas fa-school" style="color: var(--primary);"></i> École Bon Berger</h1>
+        <p>Portail Numérique Éducatif Institutionnel</p>
+    </div>
+
+    {% if form.errors %}
+        <div class="alert">
+            <i class="fas fa-exclamation-circle"></i> Identifiants incorrects. Veuillez vérifier votre e-mail ou votre mot de passe (matricule).
+        </div>
+    {% endif %}
+
+    <form method="POST">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label for="id_username">Adresse Email Institutionnelle</label>
+            <i class="fas fa-envelope input-icon"></i>
+            <input type="text" name="username" id="id_username" required autofocus placeholder="exemple@bonberger.edu">
+        </div>
+
+        <div class="form-group">
+            <label for="id_password">Mot de passe / Code Matricule</label>
+            <i class="fas fa-lock input-icon"></i>
+            <input type="password" name="password" id="id_password" required placeholder="••••••••">
+        </div>
+
+        <button type="submit" class="btn-login">
+            <i class="fas fa-sign-in-alt"></i> Se connecter au portail
+        </button>
+    </form>
+</div>
+
+</body>
+</html>

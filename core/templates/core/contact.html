@@ -1,0 +1,58 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<div style="max-width: 1000px; margin: 0 auto; padding: 40px 20px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+    
+    <h1 style="color: #0f1f72; text-align: center; margin-bottom: 10px;">Contactez-nous</h1>
+    <p style="text-align: center; color: #64748b; margin-bottom: 40px;">Une question ? Notre secrétariat et l'équipe administrative sont à votre écoute.</p>
+
+    <div style="display: flex; flex-wrap: wrap; gap: 40px; background: white; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); overflow: hidden;">
+        
+        <div style="flex: 1; min-width: 300px; background: #0f1f72; color: white; padding: 40px; display: flex; flex-direction: column; justify-content: space-between; position: relative;">
+            <div>
+                <h2 style="margin-top: 0; color: #ff991a;">Nos Coordonnées</h2>
+                <p style="line-height: 1.6; font-size: 1rem; margin-top: 20px;">
+                    <i class="fas fa-map-marker-alt" style="margin-right: 10px; color: #ff991a;"></i> 123 Avenue de l'Éducation, Quartier Administratif
+                </p>
+                <p style="line-height: 1.6; font-size: 1rem;">
+                    <i class="fas fa-phone" style="margin-right: 10px; color: #ff991a;"></i> +257 22 XX XX XX
+                </p>
+                <p style="line-height: 1.6; font-size: 1rem;">
+                    <i class="fas fa-envelope" style="margin-right: 10px; color: #ff991a;"></i> contact@bonberger.com
+                </p>
+            </div>
+
+            <div style="margin-top: 30px; border-radius: 8px; overflow: hidden; height: 150px;">
+                <img src="https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=500" alt="Secrétariat" style="width: 100%; height: 100%; object-fit: cover; opacity: 0.8;">
+            </div>
+        </div>
+
+        <div style="flex: 1.5; min-width: 300px; padding: 40px;">
+            <h2 style="margin-top: 0; color: #0f1f72;">Envoyer un message</h2>
+            <form method="POST" style="display: flex; flex-direction: column; gap: 20px; margin-top: 20px;">
+                {% csrf_token %}
+                
+                <div>
+                    <label style="display: block; margin-bottom: 8px; color: #334155; font-weight: 500;">Nom complet</label>
+                    <input type="text" placeholder="Votre nom" required style="width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 1rem;">
+                </div>
+
+                <div>
+                    <label style="display: block; margin-bottom: 8px; color: #334155; font-weight: 500;">Adresse Email</label>
+                    <input type="email" placeholder="votre@email.com" required style="width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 1rem;">
+                </div>
+
+                <div>
+                    <label style="display: block; margin-bottom: 8px; color: #334155; font-weight: 500;">Votre Message</label>
+                    <textarea rows="4" placeholder="Écrivez votre message ici..." required style="width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 1rem; resize: none;"></textarea>
+                </div>
+
+                <button type="submit" style="background: #ff991a; color: white; border: none; padding: 14px; border-radius: 8px; font-size: 1rem; font-weight: bold; cursor: pointer; transition: background 0.2s;">
+                    Envoyer le message
+                </button>
+            </form>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

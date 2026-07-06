@@ -1,0 +1,45 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<div style="max-width: 1000px; margin: 0 auto; padding: 40px 20px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+    
+    <div style="position: relative; border-radius: 15px; overflow: hidden; margin-bottom: 40px; height: 300px;">
+        <img src="https://images.unsplash.com/photo-1524178232363-1fb2b075b655?q=80&w=1000" alt="Éducation Bon Berger" style="width: 100%; height: 100%; object-fit: cover;">
+        <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 31, 114, 0.7); display: flex; align-items: center; justify-content: center;">
+            <h1 style="color: white; font-size: 2.5rem; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">Nos Valeurs & Notre Vision</h1>
+        </div>
+    </div>
+
+    <p style="text-align: center; font-size: 1.2rem; color: #64748b; margin-bottom: 50px; line-height: 1.6;">
+        À l'École Bon Berger, nous croyons en une éducation complète qui forge non seulement des compétences académiques solides, mais aussi des caractères intègres.
+    </p>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px;">
+        
+        <div style="background: white; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); overflow: hidden; transition: transform 0.2s;">
+            <img src="https://images.unsplash.com/photo-1427504494785-3a9ca7044f45?q=80&w=500" alt="Excellence" style="width: 100%; height: 180px; object-fit: cover;">
+            <div style="padding: 20px;">
+                <h3 style="color: #0f1f72; margin-top: 0;">L'Excellence Académique</h3>
+                <p style="color: #64748b; font-size: 0.95rem; line-height: 1.5;">Nous poussons chaque élève à atteindre le maximum de son potentiel intellectuel grâce à un encadrement rigoureux et innovant.</p>
+            </div>
+        </div>
+
+        <div style="background: white; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); overflow: hidden;">
+            <img src="https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?q=80&w=500" alt="Intégrité" style="width: 100%; height: 180px; object-fit: cover;">
+            <div style="padding: 20px;">
+                <h3 style="color: #0f1f72; margin-top: 0;">L'Intégrité & la Discipline</h3>
+                <p style="color: #64748b; font-size: 0.95rem; line-height: 1.5;">Le respect mutuel, l'honnêteté et le sens des responsabilités sont au cœur de nos règles de vie commune.</p>
+            </div>
+        </div>
+
+        <div style="background: white; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); overflow: hidden;">
+            <img src="https://images.unsplash.com/photo-1511632765486-a01980e01a18?q=80&w=500" alt="Solidarité" style="width: 100%; height: 180px; object-fit: cover;">
+            <div style="padding: 20px;">
+                <h3 style="color: #0f1f72; margin-top: 0;">La Solidarité</h3>
+                <p style="color: #64748b; font-size: 0.95rem; line-height: 1.5;">Nous favorisons un esprit d'équipe et d'entraide entre les élèves, le corps enseignant et les familles.</p>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

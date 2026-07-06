@@ -1,0 +1,67 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<style>
+    .form-group { margin-bottom: 15px; display: flex; flex-direction: column; gap: 5px; }
+    .form-group input { padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px; }
+    .ticket-acces { background: #f0fdf4; border: 1px dashed #22c55e; padding: 15px; border-radius: 8px; margin-top: 15px; display: none; }
+</style>
+
+<h2><i class="fas fa-id-card" style="color: var(--secondary);"></i> Service des Inscriptions & Réception</h2>
+<p style="color: #64748b; margin-bottom: 25px;">Enregistrement des nouveaux élèves et génération immédiate de leurs accès système Bon Berger.</p>
+
+<div class="grid" style="grid-template-columns: 1fr 1.5fr;">
+    
+    <div class="card">
+        <h3><i class="fas fa-user-plus"></i> Formulaire d'admission</h3>
+        <form method="POST" id="formInscription" style="margin-top: 15px;">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label>Nom de l'élève</label>
+                <input type="text" name="last_name" required placeholder="Ex: NDAYISHIMIYE" style="text-transform: uppercase;">
+            </div>
+
+            <div class="form-group">
+                <label>Prénom de l'élève</label>
+                <input type="text" name="first_name" required placeholder="Ex: Jean-Marie">
+            </div>
+
+            <button type="submit" class="btn" style="width: 100%; margin-top: 10px; background: var(--primary);">
+                <i class="fas fa-user-check"></i> Valider & Générer les Accès
+            </button>
+        </form>
+    </div>
+
+    <div class="card">
+        <h3><i class="fas fa-history"></i> Derniers élèves admis</h3>
+        <p style="color: #64748b; font-size: 13px; margin-bottom: 15px;">Liste des comptes générés rédemment. Pensez à transmettre le matricule comme mot de passe de première connexion.</p>
+        
+        <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 13px;">
+                <thead>
+                    <tr style="background: #f1f5f9; border-bottom: 2px solid #cbd5e1;">
+                        <th style="padding: 10px;">Élève</th>
+                        <th style="padding: 10px;">Email de Connexion</th>
+                        <th style="padding: 10px;">Matricule / Password</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for eleve in derniers_eleves %}
+                        <tr style="border-bottom: 1px solid #e2e8f0;">
+                            <td style="padding: 10px; font-weight: bold;">{{ eleve.last_name }} {{ eleve.first_name }}</td>
+                            <td style="padding: 10px; color: var(--secondary);"><code>{{ eleve.email }}</code></td>
+                            <td style="padding: 10px;"><span style="background: #e2e8f0; padding: 2px 6px; border-radius: 4px; font-family: monospace; font-weight: bold;">{{ eleve.matricule }}</span></td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="3" style="padding: 20px; text-align: center; color: #94a3b8; font-style: italic;">Aucune inscription réalisée aujourd'hui.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

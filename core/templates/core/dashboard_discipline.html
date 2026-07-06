@@ -1,0 +1,171 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<style>
+    .tabs { display: flex; gap: 10px; margin-bottom: 25px; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; }
+    .tab-btn { background: none; border: none; padding: 10px 20px; font-size: 16px; cursor: pointer; color: #64748b; font-weight: bold; border-radius: 6px; }
+    .tab-btn.active { background: var(--secondary); color: white; }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+    .form-group { margin-bottom: 15px; display: flex; flex-direction: column; gap: 5px; }
+    .form-group input, .form-group select, .form-group textarea { padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 14px; }
+    .badge { padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; color: white; }
+    .badge-info { background: #3b82f6; }
+    .badge-vacances { background: #ef4444; }
+    .badge-ferie { background: #f59e0b; }
+    .badge-retard { background: #64748b; }
+    .badge-puni { background: #eab308; color: black; }
+    .badge-exclu { background: #b91c1c; }
+</style>
+
+<div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('annonces')"><i class="fas fa-bullhorn"></i> Annonces & Calendrier</button>
+    <button class="tab-btn" onclick="switchTab('discipline')"><i class="fas fa-gavel"></i> Portail Disciplinaire Éléves</button>
+</div>
+
+<!-- ================= ONGLET ANNONCES ================= -->
+<div id="annonces" class="tab-content active">
+    <div class="grid" style="grid-template-columns: 1fr 2fr;">
+        <!-- Formulaire de création -->
+        <div class="card">
+            <h3>Publier une information</h3>
+            <form method="POST" style="margin-top: 15px;">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="creer_annonce">
+                <div class="form-group">
+                    <label>Titre de l'annonce</label>
+                    <input type="text" name="titre" required placeholder="Ex: Congés de Pâques">
+                </div>
+                <div class="form-group">
+                    <label>Type d'information</label>
+                    <select name="type_annonce">
+                        <option value="info">Information Générale</option>
+                        <option value="vacances">Vacances / Congés</option>
+                        <option value="ferie">Jour Férié</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Date de l'événement (Optionnel)</label>
+                    <input type="date" name="date_evenement">
+                </div>
+                <div class="form-group">
+                    <label>Message explicatif</label>
+                    <textarea name="contenu" rows="4" required></textarea>
+                </div>
+                <button type="submit" class="btn"><i class="fas fa-paper-plane"></i> Publier</button>
+            </form>
+        </div>
+
+        <!-- Liste des annonces en direct -->
+        <div class="card">
+            <h3>Historique des publications</h3>
+            <div style="margin-top: 15px; max-height: 450px; overflow-y: auto;">
+                {% for annonce in annonces %}
+                    <div style="padding: 15px; border-bottom: 1px solid #e2e8f0;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <h4>{{ annonce.titre }}</h4>
+                            <span class="badge badge-{{ annonce.type_annonce }}">{{ annonce.get_type_annonce_display }}</span>
+                        </div>
+                        <p style="margin: 8px 0; color: #475569; font-size: 14px;">{{ annonce.contenu }}</p>
+                        <small style="color: #94a3b8;">
+                            {% if annonce.date_evenement %}Événement le : {{ annonce.date_evenement|date:"d F Y" }} | {% endif %}
+                            Posté le {{ annonce.cree_le|date:"d/m H:i" }}
+                        </small>
+                    </div>
+                {% empty %}
+                    <p style="color: #94a3b8; font-style: italic;">Aucune annonce publiée pour le moment.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ================= ONGLET SUIVI DISCIPLINAIRE ================= -->
+<div id="discipline" class="tab-content">
+    <div class="grid" style="grid-template-columns: 1fr 2fr;">
+        <!-- Formulaire de sanction -->
+        <div class="card">
+            <h3>Enregistrer un incident</h3>
+            <form method="POST" style="margin-top: 15px;">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="sanctionner_eleve">
+                <div class="form-group">
+                    <label>Sélectionner l'Élève</label>
+                    <select name="eleve_id" required>
+                        <option value="">-- Choisir un élève --</option>
+                        {% for eleve in eleves %}
+                            <option value="{{ eleve.id }}">{{ eleve.last_name }} {{ eleve.first_name }} ({% if eleve.matricule %}{{ eleve.matricule }}{% else %}Pas de matricule{% endif %})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Type de mesure disciplinaire</label>
+                    <select name="type_sanction">
+                        <option value="retard">Retardateur</option>
+                        <option value="puni">Élève Puni (Consigne / Retenue)</option>
+                        <option value="exclu">Élève Exclu de l'établissement</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Date de fin de la mesure (Optionnel)</label>
+                    <input type="date" name="date_fin">
+                </div>
+                <div class="form-group">
+                    <label>Motif précis de l'incident</label>
+                    <textarea name="motif" rows="4" required placeholder="Ex: Retard répété de 20 minutes ou Bagarre dans la cour"></textarea>
+                </div>
+                <button type="submit" class="btn" style="background-color: var(--dark);"><i class="fas fa-gavel"></i> Appliquer la décision</button>
+            </form>
+        </div>
+
+        <!-- Tableau des élèves sous surveillance -->
+        <div class="card">
+            <h3>Tableau de suivi en temps réel</h3>
+            <div style="margin-top: 15px; overflow-x: auto;">
+                <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 14px;">
+                    <thead>
+                        <tr style="background: #f1f5f9; border-bottom: 2px solid #cbd5e1;">
+                            <th style="padding: 10px;">Élève</th>
+                            <th style="padding: 10px;">Status</th>
+                            <th style="padding: 10px;">Motif</th>
+                            <th style="padding: 10px;">Depuis le</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for sanction in sanctions %}
+                            <tr style="border-bottom: 1px solid #e2e8f0;">
+                                <td style="padding: 12px; font-weight: bold;">{{ sanction.eleve.get_full_name }}</td>
+                                <td style="padding: 12px;"><span class="badge badge-{{ sanction.type_sanction }}">{{ sanction.get_type_sanction_display }}</span></td>
+                                <td style="padding: 12px; color: #475569;">{{ sanction.motif }}</td>
+                                <td style="padding: 12px; color: #94a3b8;">{{ sanction.date_debut|date:"d/m/Y" }}</td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="4" style="padding: 20px; text-align: center; color: #94a3b8; font-style: italic;">Aucun élève signalé actuellement. Tout est calme !</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Script JavaScript d'aiguillage des onglets du portail -->
+<script>
+    function switchTab(tabId) {
+        // Cacher tous les contenus
+        document.querySelectorAll('.tab-content').forEach(content => {
+            content.classList.remove('active');
+        });
+        // Enlever la classe active de tous les boutons
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        
+        // Afficher le contenu sélectionné et activer le bon bouton
+        document.getElementById(tabId).classList.add('active');
+        event.currentTarget.classList.add('active');
+    }
+</script>
+{% endblock %}

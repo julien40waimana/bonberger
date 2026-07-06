@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8"><title>Demande de Compte — Bon Berger</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { background: #cbd5e1; display: flex; justify-content: center; align-items: center; min-height: 100vh; font-family: sans-serif; padding: 20px; }
+        .reg-box { background: white; padding: 35px; border-radius: 12px; width: 100%; max-width: 500px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border-top: 5px solid #1e3a8a; }
+        .form-group { margin-bottom: 15px; display: flex; flex-direction: column; gap: 5px; }
+        .form-group input { padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px; }
+        .btn { width: 100%; padding: 12px; background: #1e3a8a; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 15px; }
+    </style>
+</head>
+<body>
+<div class="reg-box">
+    <h2 style="color: #1e3a8a; margin-bottom: 5px;"><i class="fas fa-user-plus"></i> Rejoindre le Personnel</h2>
+    <p style="color: #64748b; font-size: 13px; margin-bottom: 25px;">Remplissez vos informations. Votre compte devra être approuvé par la direction.</p>
+    
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="form-group"><label>Nom de famille</label>{{ form.last_name }}</div>
+        <div class="form-group"><label>Prénom</label>{{ form.first_name }}</div>
+        <div class="form-group"><label>Adresse Email Professionnelle</label>{{ form.email }}</div>
+        <div class="form-group"><label>Photo de Profil</label>{{ form.photo_profil }}</div>
+        <div class="form-group"><label>Mot de passe personnalisé</label>{{ form.password }}</div>
+        <button type="submit" class="btn">Soumettre ma demande</button>
+    </form>
+    <p style="text-align: center; margin-top: 20px; font-size: 14px;"><a href="{% url 'login' %}" style="color: #0284c7; text-decoration: none;">Retour à la connexion</a></p>
+</div>
+</body>
+</html>

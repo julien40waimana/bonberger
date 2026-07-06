@@ -1,0 +1,182 @@
+{% extends 'core/base.html' %}
+{% block content %}
+<style>
+    .grid-users { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; margin-top: 25px; }
+    .user-card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); display: flex; flex-direction: column; justify-content: space-between; border: 1px solid #e2e8f0; }
+    .user-info { display: flex; gap: 15px; align-items: center; margin-bottom: 15px; }
+    .user-avatar { width: 65px; height: 65px; border-radius: 50%; object-fit: cover; background: #e2e8f0; border: 2px solid var(--primary); }
+    .role-badge { display: inline-block; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; text-transform: uppercase; margin-top: 5px; }
+    .select-role { padding: 8px; border-radius: 6px; border: 1px solid #cbd5e1; width: 100%; font-size: 13px; background: #f8fafc; }
+</style>
+
+{% comment %} <h2><i class="fas fa-user-shield" style="color: var(--primary);"></i> Direction Générale — Espace Préfet</h2> {% endcomment %}
+<h2>
+    <i class="fas fa-user-shield" style="color: var(--primary);"></i> Direction Générale — 
+    {% if request.GET.filtre == 'eleve' %}
+        Liste des Élèves Inscrites
+    {% elif request.GET.filtre == 'admin' %}
+        Équipe d'Administration du Portail
+    {% else %}
+        Espace Préfet (Tous les Utilisateurs)
+    {% endif %}
+</h2>
+<div style="margin: 20px 0; max-width: 500px;">
+    <form method="GET" action="" style="display: flex; gap: 10px;">
+        <input type="text" name="q" placeholder="Rechercher un utilisateur..." value="{{ request.GET.q }}" style="flex: 1; padding: 10px 15px; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 14px;">
+        <button type="submit" style="padding: 10px 20px; background: #1e3a8a; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 500;"><i class="fas fa-search"></i></button>
+        {% if request.GET.q %}
+            <a href="?" style="padding: 10px 15px; background: #e2e8f0; border-radius: 6px; text-decoration: none; color: #333; font-size: 14px;">Effacer</a>
+        {% endif %}
+    </form>
+</div>
+<p style="color: #64748b;">Contrôle des accès, validation du personnel et affectation des rôles applicatifs.</p>
+
+<div class="grid-users">
+    {% for u in utilisateurs %}
+        <div class="user-card">
+            <div>
+                <div class="user-info">
+                    {% if u.photo_profil %}
+                        <img src="{{ u.photo_profil.url }}" class="user-avatar" alt="Profil">
+                    {% else %}
+                        <div class="user-avatar" style="display:flex; align-items:center; justify-content:center; font-weight:bold; color:var(--primary);">{{ u.first_name|slice:":1" }}{{ u.last_name|slice:":1" }}</div>
+                    {% endif %}
+                    <div>
+                        <h4 style="margin: 0; font-size: 16px;">{{ u.last_name }} {{ u.first_name }}</h4>
+                        <p style="margin: 3px 0 0; font-size: 13px; color: #64748b;"><i class="fas fa-envelope"></i> {{ u.email }}</p>
+                        
+                        <span class="role-badge" style="
+                            {% if u.role == 'en_attente' %}background:#fee2e2; color:#991b1b;
+                            {% elif u.role == 'comptable' %}background:#fef3c7; color:#92400e;
+                            {% elif u.role == 'professeur' %}background:#d1fae5; color:#065f46;
+                            {% else %}background:#e0f2fe; color:#0369a1;{% endif %}">
+                            {{ u.get_role_display }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <form method="POST" style="border-top: 1px solid #f1f5f9; padding-top: 15px; margin-top: 10px;">
+                {% csrf_token %}
+                <input type="hidden" name="user_id" value="{{ u.id }}">
+                <div style="display: flex; gap: 8px;">
+                    <select name="role" class="select-role">
+                        <option value="en_attente" {% if u.role == 'en_attente' %}selected{% endif %}>En attente</option>
+                        <option value="professeur" {% if u.role == 'professeur' %}selected{% endif %}>Professeur</option>
+                        <option value="comptable" {% if u.role == 'comptable' %}selected{% endif %}>Comptable</option>
+                        <option value="dir_discipline" {% if u.role == 'dir_discipline' %}selected{% endif %}>Dir. Discipline</option>
+                        <option value="dir_etudes" {% if u.role == 'dir_etudes' %}selected{% endif %}>Dir. Études</option>
+                        <option value="receptionniste" {% if u.role == 'receptionniste' %}selected{% endif %}>Réceptionniste</option>
+                        <option value="superadmin" {% if u.role == 'superadmin' %}selected{% endif %}>Préfet (Superadmin)</option>
+                    </select>
+                    <button type="submit" class="btn" style="padding: 0 12px; font-size: 13px; background: var(--secondary);"><i class="fas fa-save"></i></button>
+            <button type="button" 
+                    onclick="ouvrirModalSuppression('{% url 'supprimer_utilisateur' u.id %}', '{{ u.first_name }} {{ u.last_name }}')" 
+                    style="background: #dc2626; color: white; padding: 8px 12px; border-radius: 6px; text-align: center; display: inline-flex; align-items: center; justify-content: center; border: none; height: 38px; cursor: pointer;" 
+                    title="Supprimer">
+                <i class="fas fa-trash-alt"></i>
+            </button>
+                </div>
+            </form>
+        </div>
+    {% empty %}
+        <p style="color: #94a3b8; font-style: italic;">Aucun autre membre enregistré pour l'instant.</p>
+    {% endfor %}
+</div>
+<!-- STRUCTURE DE LA FENÊTRE MODALE ANIMÉE DE SUPPRESSION -->
+<div id="customConfirmModal" style="display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); z-index: 9999; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.25s ease;">
+    <div id="modalContent" style="background: white; border-radius: 12px; padding: 24px; max-width: 400px; width: 90%; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); transform: scale(0.9); transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1); text-align: center;">
+        <div style="background: #fee2e2; color: #dc2626; width: 56px; height: 56px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; font-size: 24px;">
+            <i class="fas fa-exclamation-triangle"></i>
+        </div>
+        <h3 style="margin: 0 0 8px 0; color: #0f172a; font-size: 18px; font-weight: 600;">Confirmer la suppression</h3>
+        <p id="modalMessage" style="margin: 0 0 24px 0; color: #64748b; font-size: 14px; line-height: 1.5;"></p>
+        <div style="display: flex; gap: 12px; justify-content: center;">
+            <button onclick="fermerModalSuppression()" style="flex: 1; padding: 10px 16px; background: #f1f5f9; color: #334155; border: none; border-radius: 6px; cursor: pointer; font-weight: 500; font-size: 14px; transition: background 0.2s;">Annuler</button>
+            <a id="modalConfirmBtn" href="#" style="flex: 1; padding: 10px 16px; background: #dc2626; color: white; border: none; border-radius: 6px; text-decoration: none; cursor: pointer; font-weight: 500; font-size: 14px; display: inline-block; transition: background 0.2s;">Supprimer</a>
+        </div>
+    </div>
+</div>
+
+<!-- CONTENEUR DES PETITS MESSAGES (TOASTS) -->
+<div id="toastContainer" style="position: fixed; top: 20px; right: 20px; z-index: 10000; display: flex; flex-direction: column; gap: 10px;"></div>
+<script>
+// --- LOGIQUE DE LA FENÊTRE DE SUPPRESSION ---
+let modal = document.getElementById('customConfirmModal');
+let modalContent = document.getElementById('modalContent');
+
+function ouvrirModalSuppression(url, nomUtilisateur) {
+    document.getElementById('modalMessage').innerHTML = `Êtes-vous sûr de vouloir supprimer définitivement l'utilisateur <strong>${nomUtilisateur}</strong> ? Cette action est irréversible.`;
+    document.getElementById('modalConfirmBtn').setAttribute('href', url);
+    
+    modal.style.display = 'flex';
+    // Forcer un reflow pour appliquer l'animation
+    setTimeout(() => {
+        modal.style.opacity = '1';
+        modalContent.style.transform = 'scale(1)';
+    }, 10);
+}
+
+function fermerModalSuppression() {
+    modal.style.opacity = '0';
+    modalContent.style.transform = 'scale(0.9)';
+    setTimeout(() => {
+        modal.style.display = 'none';
+    }, 250); // Attend la fin de la transition CSS
+}
+
+// Fermer la modal si on clique à côté
+modal.addEventListener('click', function(e) {
+    if (e.target === modal) fermerModalSuppression();
+});
+
+
+// --- LOGIQUE DES PETITS MESSAGES DE MISE À JOUR (TOASTS) ---
+function afficherNotification(message, type = 'success') {
+    let container = document.getElementById('toastContainer');
+    let toast = document.createElement('div');
+    
+    // Style de la notification
+    toast.style.cssText = `
+        background: white;
+        color: #0f172a;
+        padding: 14px 20px;
+        border-radius: 8px;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        border-left: 4px solid ${type === 'success' ? '#10b981' : '#ef4444'};
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 14px;
+        font-weight: 500;
+        transform: translateX(120%);
+        transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s;
+        opacity: 0;
+    `;
+    
+    let icone = type === 'success' ? '<i class="fas fa-check-circle" style="color: #10b981; font-size: 16px;"></i>' : '<i class="fas fa-exclamation-circle" style="color: #ef4444; font-size: 16px;"></i>';
+    toast.innerHTML = `${icone} <span>${message}</span>`;
+    
+    container.appendChild(toast);
+    
+    // Animation d'entrée
+    setTimeout(() => {
+        toast.style.transform = 'translateX(0)';
+        toast.style.opacity = '1';
+    }, 50);
+    
+    // Animation de sortie automatique après 4 secondes
+    setTimeout(() => {
+        toast.style.transform = 'translateX(120%)';
+        toast.style.opacity = '0';
+        setTimeout(() => toast.remove(), 300);
+    }, 4000);
+}
+document.querySelectorAll('form').forEach(form => {
+    if (form.action.includes('modifier') || form.querySelector('select')) {
+        form.addEventListener('submit', function(e) {
+        });
+    }
+});
+</script>
+{% endblock %}
