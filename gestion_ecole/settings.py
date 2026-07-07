@@ -27,6 +27,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['bonberger.onrender.com', '127.0.0.1', 'localhost']
 
+CSRF_TRUSTED_ORIGINS = ['https://bonberger.onrender.com',]
+
 # Application definition
 
 INSTALLED_APPS = [
