@@ -20,3 +20,16 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+from django.contrib.auth import get_user_model
+
+def create_admin_automatic():
+    User = get_user_model()
+    if not User.objects.filter(username="admin_bonberger").exists():
+        User.objects.create_superuser("admin_bonberger", "admin@example.com", "MonMotDePasseSecurise123!")
+        print("Superuser créé avec succès !")
+        
+def main():
+    create_admin_automatic() # <--- Ajoute cette ligne ici
+    """Run administrative tasks."""
+    ...
