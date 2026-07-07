@@ -8,3 +8,4 @@ python-discovery==1.1.3
 virtualenv==21.2.0
 virtualenvwrapper-win==1.2.7
 Django
+Pillow
