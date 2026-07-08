@@ -35,7 +35,7 @@ def dashboard_aiguillage(request):
 
     # 2. LES REDIRECTIONS DIRECTES
     if request.user.is_superuser or role == 'superadmin':
-        return redirect('/admin') # Te renvoie directement sur le vrai panneau d'administration de Django
+        return redirect('dashboard_superadmin') # Te renvoie directement sur le vrai panneau d'administration de Django
     elif role == 'prefet':
         return redirect('dashboard_prefet')
     elif role == 'professeur':
