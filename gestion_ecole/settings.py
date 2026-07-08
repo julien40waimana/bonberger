@@ -115,12 +115,14 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
+import os
 
 STATIC_URL = 'static/'
 AUTH_USER_MODEL = 'core.Utilisateur'
 LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'aiguillage'
 LOGOUT_REDIRECT_URL = '/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 # Tout au fond de ton settings.py
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend', # Conserve le comportement par défaut
