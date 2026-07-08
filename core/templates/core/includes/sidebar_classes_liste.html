@@ -1,0 +1,31 @@
+<div style="padding: 10px;">
+    <h3 style="color: var(--dark); margin-bottom: 5px;"><i class="fas fa-graduation-cap"></i> Mes Classes Enseignées</h3>
+    <p style="color: var(--secondary); font-size: 14px; margin-bottom: 25px;">Sélectionnez une classe ci-dessous pour consulter son effectif et la liste de ses élèves.</p>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px;">
+        {% for groupe in classes_enseignees %}
+            <div class="card-classe" onclick="voirElevesDeLaClasse('{{ groupe.classe }}', '{{ groupe.promotion }}')" 
+                 style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 20px; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
+                <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 10px;">
+                    <div style="background: #e0f2fe; color: #0369a1; padding: 12px; border-radius: 8px;">
+                        <i class="fas fa-users-class fa-lg"></i>
+                    </div>
+                    <div>
+                        <h4 style="margin: 0; color: #1e293b;">{{ groupe.classe }}</h4>
+                        <span style="font-size: 12px; font-weight: 600; color: #0284c7; background: #f0f9ff; padding: 2px 8px; border-radius: 20px;">
+                            {{ groupe.promotion }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div style="grid-column: 1/-1; text-align: center; color: #94a3b8; padding: 40px;">
+                <i class="fas fa-folder-open fa-2x"></i>
+                <p style="margin-top: 10px;">Vous n'avez aucune classe ou promotion attribuée pour le moment.</p>
+            </div>
+        {% endfor %}
+    </div>
+    
+    <!-- Zone tampon pour charger les élèves de la classe sélectionnée -->
+    <div id="zone-affichage-eleves" style="margin-top: 30px;"></div>
+</div>

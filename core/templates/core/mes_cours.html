@@ -1,0 +1,17 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<div class="dashboard-content" style="padding: 20px; font-family: 'Segoe UI', sans-serif;">
+    <div class="card" style="padding: 20px; background: #fff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+        <h2 style="margin-top: 0; color: var(--dark); font-size: 22px;">
+            <i class="fas fa-book" style="color: var(--primary); margin-right: 10px;"></i> Mes Cours Suivis
+        </h2>
+        <p style="color: #64748b; font-size: 14px; margin-bottom: 20px;">Retrouvez l'ensemble de vos matières et supports de cours téléchargeables.</p>
+        
+        <div style="padding: 30px; text-align: center; background: #f8fafc; border: 2px dashed #e2e8f0; border-radius: 8px;">
+            <i class="fas fa-folder-open fa-3x" style="color: #94a3b8; margin-bottom: 15px;"></i>
+            <p style="color: #475569; font-size: 16px; margin: 0; font-style: italic;">Aucun support de cours n'a été téléversé par vos professeurs pour le moment.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

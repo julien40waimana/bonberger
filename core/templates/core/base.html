@@ -106,21 +106,45 @@
     <nav>
         <div class="logo">
             <h2><i class="fas fa-school"></i> Bon Berger</h2>
-            <ul>
-                <li><a href="{% url 'aiguillage' %}" class="active"><i class="fas fa-home"></i> Accueil</a></li>
-                <li><a href="{% url 'modifier_profil' %}"><i class="fas fa-user-edit"></i> Mon Profil</a></li>
-                <!-- À coller juste en dessous du lien "Mon Profil" -->
-               <li><a href="?q=eleve" style="display: flex; align-items: center; gap: 10px; padding: 12px 16px; color: #cbd5e1; text-decoration: none; font-size: 15px;">
-                <i class="fas fa-graduation-cap"></i> Liste des Élèves</a><li>
-                <li><a href="?filtre=admin" class="{% if request.GET.filtre == 'admin' %}active{% endif %}">
-                <i class="fas fa-user-shield"></i> Liste des Admins</a><li>
-              <form action="{% url 'logout' %}" method="POST" style="display: inline; margin: 0; padding: 0;">
-            {% csrf_token %}
-            <button type="submit" style="background: none; border: none; color: inherit; font: inherit; cursor: pointer; display: flex; align-items: center; gap: 10px; width: 100%; padding: 10px 15px; text-decoration: none;">
-                <i class="fas fa-sign-out-alt"></i> Déconnexion
-            </button>
-        </form>
-                    </ul>
+    <ul style="list-style: none; padding: 0; margin: 0;">
+            <li><a href="{% url 'aiguillage' %}" class="active"><i class="fas fa-home"></i> Accueil</a></li>
+            <li><a href="{% url 'modifier_profil' %}"><i class="fas fa-user-edit"></i> Mon Profil</a></li>
+             {% if request.user.role == 'dir_etudes' or request.user.role == 'superadmin' %}
+            <li><a href="{% url 'liste_professeurs' %}">
+                <i class="fas fa-users" style="width: 20px; color: #cbd5e1;"></i> Les Professeurs
+            </a></li>
+            {% endif %}
+            <li><a href="{% url 'liste_classes_professeur' %}" class="" id="btn-mes-classes" onclick="ouvrirMenuClasses(event)">
+                <i class="fas fa-users"></i>
+                <span>Mes Classes & Élèves</span>
+            </a></li>
+            <!-- === MENUS VISIBLES UNIQUEMENT PAR LES ÉLÈVES === -->
+            {% if request.user.role == 'eleve' %}
+                <li><a href="{% url 'mes_cours_eleve' %}" style="display: flex; align-items: center; gap: 10px; padding: 12px 16px; color: #cbd5e1; text-decoration: none;"><i class="fas fa-book"></i> Mes Cours</a></li>
+                <li><a href="{% url 'resultats_eleve' %}" style="display: flex; align-items: center; gap: 10px; padding: 12px 16px; color: #cbd5e1; text-decoration: none;"><i class="fas fa-graduation-cap"></i> Résultats</a></li>
+            {% endif %}
+
+            <!-- === MENUS VISIBLES UNIQUEMENT PAR LES ADMINS / PREFETS / SUPERADMINS === -->
+            {% if request.user.is_superuser or request.user.role == 'superadmin' or request.user.role == 'prefet' %}
+                <li><a href="?q=eleve" style="display: flex; align-items: center; gap: 10px; padding: 12px 16px; color: #cbd5e1; text-decoration: none;"><i class="fas fa-graduation-cap"></i> Liste des Élèves</a></li>
+                <li class="{% if request.GET.filtre == 'admin' %}active{% endif %}"><a href="?filtre=admin"><i class="fas fa-user-shield"></i> Liste des Admins</a></li>
+            {% endif %}
+            {% if request.user.role == 'eleve' %}
+                <!-- Tes autres liens comme Accueil ou Bulletins... -->
+                <a href="{% url 'espace_eleve_paiement' %}" style="display: flex; align-items: center; padding: 12px; color: white; text-decoration: none; border-radius: 8px;">
+                    <i class="fas fa-wallet" style="margin-right: 12px; width: 20px;"></i> Mes Paiements
+                </a>
+            {% endif %}
+            <!-- Formulaire de déconnexion existant -->
+            <li>
+                <form action="{% url 'logout' %}" method="POST" style="display: inline; margin: 0; padding: 0;">
+                    {% csrf_token %}
+                    <button type="submit" style="background: none; border: none; color: inherit; font: inherit; cursor: pointer; display: flex; align-items: center; gap: 10px; padding: 12px 16px;">
+                        <i class="fas fa-sign-out-alt"></i> Déconnexion
+                    </button>
+                </form>
+            </li>
+        </ul>
         </div>
         <div>
             <small>© 2026 Ecole Bon Berger</small>

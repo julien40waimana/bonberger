@@ -26,6 +26,39 @@
                 <label>Prénom de l'élève</label>
                 <input type="text" name="first_name" required placeholder="Ex: Jean-Marie">
             </div>
+            <!-- ... Après le champ Prénom de l'élève ... -->
+<div style="margin-bottom: 15px;">
+    <label style="display: block; margin-bottom: 5px; font-weight: 600; color: #475569;">Classe</label>
+    <select name="classe" required style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px;">
+        <option value="">-- Choisir la classe --</option>
+        <option value="7 eme">7ème Année</option>
+        <option value="8 eme">8ème Année</option>
+        <option value="9 eme">9ème Année</option>
+        <option value="4 eme scientifique">4ème Scientifique</option>
+        <!-- Ajoute tes autres classes ici -->
+    </select>
+</div>
+
+        <div style="margin-bottom: 15px;">
+            <label style="display: block; margin-bottom: 5px; font-weight: 600; color: #475569;">Section / Option</label>
+            <select name="section" required style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px;">
+                <option value="">-- Choisir la section --</option>
+                <option value="Fondamentale">Fondamentale</option>
+                <option value="Sciences">Sciences</option>
+                <option value="Lettres">Lettres</option>
+                <option value="Technique">Technique informatique</option>
+            </select>
+        </div>
+
+        <div style="margin-bottom: 15px;">
+            <label style="display: block; margin-bottom: 5px; font-weight: 600; color: #475569;">Promotion (Année Scolaire)</label>
+            <select name="promotion" required style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px;">
+                <option value="">-- Choisir la promotion --</option>
+                <option value="2025-2026">2025-2026</option>
+                <option value="2026-2027">2026-2027</option>
+            </select>
+        </div>
+<!-- ... Juste avant le bouton Valider ... -->
 
             <button type="submit" class="btn" style="width: 100%; margin-top: 10px; background: var(--primary);">
                 <i class="fas fa-user-check"></i> Valider & Générer les Accès

@@ -1,0 +1,48 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<div style="padding: 25px; font-family: 'Segoe UI', system-ui, sans-serif;">
+    <div style="background: white; border-radius: 12px; padding: 25px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
+        
+        <div style="margin-bottom: 25px; border-bottom: 2px solid #f1f5f9; padding-bottom: 15px;">
+            <h2 style="color: #0f172a; margin: 0; font-size: 22px;">
+                <i class="fas fa-graduation-cap" style="color: #10b981; margin-right: 10px;"></i> Mes Résultats Académiques
+            </h2>
+            <p style="color: #64748b; font-size: 14px; margin-top: 5px;">Consultez vos notes d'évaluations et de compositions publiées en temps réel par vos professeurs.</p>
+        </div>
+
+        {% if request.user.mes_notes.all %}
+            <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 14px;">
+                <thead>
+                    <tr style="background: #f8fafc; border-bottom: 2px solid #e2e8f0;">
+                        <th style="padding: 14px; color: #475569;">Matière / Cours</th>
+                        <th style="padding: 14px; color: #475569;">Enseignant</th>
+                        <th style="padding: 14px; color: #475569; text-align: center;">Interrogation (/20)</th>
+                        <th style="padding: 14px; color: #475569; text-align: center;">Examen (/40)</th>
+                        <th style="padding: 14px; color: #475569; text-align: center; font-weight: 700;">Total (/60)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for note in request.user.mes_notes.all %}
+                        <tr style="border-bottom: 1px solid #f1f5f9;">
+                            <td style="padding: 14px; font-weight: 600; color: #1e3a8a;">{{ note.cours_attribue.nom_cours }}</td>
+                            <td style="padding: 14px; color: #475569;">Prof. {{ note.cours_attribue.professeur.last_name }}</td>
+                            <td style="padding: 14px; text-align: center; color: #0f172a;">{{ note.note_interro }}</td>
+                            <td style="padding: 14px; text-align: center; color: #0f172a;">{{ note.note_examen }}</td>
+                            <td style="padding: 14px; text-align: center; font-weight: 700; color: {% if note.total_obtenu < 30 %}#dc2626{% else %}#16a34a{% endif %};">
+                                {{ note.total_obtenu }}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <div style="padding: 40px; text-align: center; background: #f8fafc; border: 2px dashed #e2e8f0; border-radius: 8px;">
+                <i class="fas fa-file-invoice fa-3x" style="color: #94a3b8; margin-bottom: 15px;"></i>
+                <p style="color: #475569; font-size: 15px; margin: 0; font-style: italic;">Aucune note n'a encore été publiée sur votre portail pour le moment.</p>
+            </div>
+        {% endif %}
+        
+    </div>
+</div>
+{% endblock %}

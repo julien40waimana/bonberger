@@ -1,70 +1,129 @@
 {% extends 'core/base.html' %}
 
 {% block content %}
-<div class="grid">
-    <div class="card">
-        <h3><i class="fas fa-wallet" style="color: var(--secondary);"></i> Situation Financière</h3>
-        <p style="font-size: 24px; font-weight: bold; margin: 15px 0;">
-            Solde actuel : {{ situation.solde_financier }} USD
-        </p>
-        {% if situation.solde_financier > 0 %}
-            <span style="color: red;"><i class="fas fa-exclamation-circle"></i> Reste à payer</span>
-        {% else %}
-            <span style="color: var(--success);"><i class="fas fa-check-circle"></i> En règle de paiement</span>
-        {% endif %}
-    </div>
+<div class="dashboard-content" style="padding: 20px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
 
-    <div class="card">
-        <h3><i class="fas fa-file-invoice" style="color: var(--success);"></i> Mon Bulletin</h3>
-        <p style="margin: 15px 0; color: #64748b;">Consultez vos résultats du dernier trimestre.</p>
-        {% if situation.bulletin_url %}
-            <a href="{{ situation.bulletin_url.url }}" class="btn" target="_blank"><i class="fas fa-download"></i> Télécharger le Bulletin</a>
-        {% else %}
-            <p style="font-style: italic; color: #94a3b8;">Bulletin non encore disponible.</p>
-        {% endif %}
-    </div>
-</div>
-<!-- BANDEAU D'ALERTE DISCIPLINAIRE (S'affiche uniquement s'il est puni) -->
-{% if mes_sanctions %}
-    <div style="background: #fee2e2; border-left: 5px solid #ef4444; padding: 20px; border-radius: 8px; margin-top: 25px;">
-        <h3 style="color: #991b1b;"><i class="fas fa-exclamation-triangle"></i> Notification de la Direction de Discipline</h3>
-        {% for s in mes_sanctions %}
-            <p style="margin-top: 10px; color: #7f1d1d;">
-                Vous êtes actuellement signalé comme : <strong>{{ s.get_type_sanction_display }}</strong>.<br>
-                <span style="font-style: italic;">Motif : {{ s.motif }}</span>
-            </p>
-        {% endfor %}
-    </div>
-{% endif %}
-
-<!-- SECTION ANNONCES DE L'ÉCOLE BON BERGER -->
-<div class="card" style="margin-top: 25px;">
-    <h2><i class="fas fa-bullhorn" style="color: var(--primary);"></i> Tableau d'affichage de l'école</h2>
-    <p style="color: #64748b; font-size: 14px; margin-bottom: 15px;">Restez informé des vacances, jours fériés et événements à venir.</p>
-    
-    <div style="display: flex; flex-direction: column; gap: 15px;">
-        {% for annonce in annonces %}
-            <div style="padding: 15px; background: #f8fafc; border-radius: 8px; border: 1px solid #e2e8f0;">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <strong style="font-size: 16px; color: var(--dark);">{{ annonce.titre }}</strong>
-                    <!-- Utilisation des mêmes classes dynamiques du portail discipline -->
-                    <span class="badge" style="
-                        {% if annonce.type_annonce == 'info' %}background:#3b82f6;
-                        {% elif annonce.type_annonce == 'vacances' %}background:#ef4444;
-                        {% else %}background:#f59e0b;{% endif %}
-                        padding: 4px 8px; border-radius: 4px; color: white; font-size: 12px;
-                    ">{{ annonce.get_type_annonce_display }}</span>
-                </div>
-                <p style="margin-top: 8px; color: #475569; font-size: 14.5px;">{{ annonce.contenu }}</p>
-                {% if annonce.date_evenement %}
-                    <p style="margin-top: 5px; font-size: 12px; color: var(--secondary); font-weight: bold;">
-                        <i class="far fa-calendar-alt"></i> Date de l'événement : {{ annonce.date_evenement|date:"d F Y" }}
-                    </p>
-                {% endif %}
+    <!-- ========================================================= -->
+    <!-- LIGNE 1 : RÉSUMÉ ACADÉMIQUE & SITUATION FINANCIÈRE      -->
+    <!-- ========================================================= -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-bottom: 25px;">
+        
+        <!-- Résumé Académique -->
+        <div class="card" style="padding: 20px; background: #fff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+            <h3 style="margin-top: 0; color: var(--dark); font-size: 18px;"><i class="fas fa-university" style="color: var(--primary); margin-right: 10px;"></i> Résumé Académique</h3>
+            <div style="margin-top: 15px; font-size: 15px; line-height: 1.6; color: #475569;">
+                <p style="margin: 8px 0;"><strong>Niveau & Promotion :</strong> {{ request.user.niveau|default:"Non spécifié" }} - {{ request.user.promotion|default:"Non spécifiée" }}</p>
+                <p style="margin: 8px 0;"><strong>Programme d'études :</strong> {{ request.user.programme|default:"Non spécifié" }}</p>
+                <p style="margin: 8px 0;"><strong>Statut d'inscription :</strong> <span style="color: var(--success); font-weight: bold;"><i class="fas fa-check-circle"></i> Actif</span></p>
             </div>
-        {% empty %}
-            <p style="color: #94a3b8; font-style: italic;">Aucune annonce affichée.</p>
-        {% endfor %}
+        </div>
+        
+        <!-- Situation Financière -->
+        <div class="card" style="padding: 20px; background: #fff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+            <h3 style="margin-top: 0; color: var(--dark); font-size: 18px;"><i class="fas fa-wallet" style="color: var(--secondary); margin-right: 10px;"></i> Situation Financière</h3>
+            <p style="font-size: 24px; font-weight: bold; margin: 15px 0; color: #1e293b;">
+                Solde actuel : {{ situation.solde_financier|default:"0.00" }} USD
+            </p>
+            {% if situation.solde_financier > 0 %}
+                <span style="color: #ef4444; font-weight: 500; font-size: 14px;"><i class="fas fa-exclamation-circle"></i> Reste à payer</span>
+            {% else %}
+                <span style="color: var(--success); font-weight: 500; font-size: 14px;"><i class="fas fa-check-circle"></i> En règle de paiement</span>
+            {% endif %}
+        </div>
+
     </div>
-</div>
+
+    <!-- ========================================================= -->
+    <!-- LIGNE 2 : NOTIFICATIONS & CALENDRIER DES ACTIVITÉS        -->
+    <!-- ========================================================= -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-bottom: 25px;">
+        
+        <!-- Notifications -->
+        <div class="card" style="padding: 20px; background: #fff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+            <h3 style="margin-top: 0; color: var(--dark); font-size: 18px;"><i class="fas fa-bell" style="color: #ef4444; margin-right: 10px;"></i> Notifications</h3>
+            <ul style="margin-top: 15px; padding-left: 20px; color: #475569; font-size: 14.5px; line-height: 1.6;">
+                <li style="margin-bottom: 8px;">Bienvenue sur votre nouveau tableau de bord étudiant en ligne !</li>
+                <!-- Ta boucle dynamique sur tes notifications pourra être injectée ici plus tard -->
+                <li style="color: #94a3b8; font-style: italic; list-style-type: none; margin-left: -20px;">Aucune autre notification récente.</li>
+            </ul>
+        </div>
+        
+        <!-- Calendrier des activités -->
+        <div class="card" style="padding: 20px; background: #fff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+            <h3 style="margin-top: 0; color: var(--dark); font-size: 18px;"><i class="fas fa-calendar-alt" style="color: #f59e0b; margin-right: 10px;"></i> Calendrier des activités</h3>
+            <div style="margin-top: 15px; color: #475569; font-size: 14.5px;">
+                <div style="padding: 10px; background: #fffbeb; border-left: 4px solid #f59e0b; border-radius: 4px; margin-bottom: 10px;">
+                    <strong style="color: #b45309; display: block;">Session d'examens approchante</strong>
+                    <span style="font-size: 12px; color: #78350f;">Préparez vos supports pour le contrôle semestriel.</span>
+                </div>
+                <p style="color: #94a3b8; font-style: italic; margin: 0;">Aucun autre événement prévu cette semaine.</p>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ========================================================= -->
+    <!-- ALERTE DISCIPLINAIRE (S'affiche uniquement s'il est puni) -->
+    <!-- ========================================================= -->
+    {% if mes_sanctions %}
+        <div style="background: #fee2e2; border-left: 5px solid #ef4444; padding: 20px; border-radius: 8px; margin-bottom: 25px;">
+            <h3 style="color: #991b1b; margin-top: 0; font-size: 18px;"><i class="fas fa-exclamation-triangle"></i> Notification de la Direction de Discipline</h3>
+            {% for s in mes_sanctions %}
+                <p style="margin-top: 10px; color: #7f1d1d; font-size: 14.5px; line-height: 1.5;">
+                    Vous êtes actuellement signalé comme : <strong>{{ s.get_type_sanction_display }}</strong>.<br>
+                    <span style="font-style: italic; color: #991b1b;">Motif : {{ s.motif }}</span>
+                </p>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <!-- ========================================================= -->
+    <!-- LIGNE 3 : TABLEAU D'AFFICHAGE & RACCOURCIS RAPIDES       -->
+    <!-- ========================================================= -->
+    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px; align-items: start;">
+        
+        <!-- Tableau d'affichage de l'école -->
+        <div class="card" style="padding: 20px; background: #fff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+            <h2 style="margin-top: 0; color: var(--dark); font-size: 20px;"><i class="fas fa-bullhorn" style="color: var(--primary); margin-right: 10px;"></i> Tableau d'affichage de l'école</h2>
+            <p style="color: #64748b; font-size: 14px; margin-bottom: 15px;">Restez informé des vacances, jours fériés et événements à venir.</p>
+            
+            <div style="display: flex; flex-direction: column; gap: 15px;">
+                {% for annonce in annonces %}
+                    <div style="padding: 15px; background: #f8fafc; border-radius: 8px; border: 1px solid #e2e8f0;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <strong style="font-size: 16px; color: var(--dark);">{{ annonce.titre }}</strong>
+                            <span class="badge" style="
+                                {% if annonce.type_annonce == 'info' %}background:#3b82f6;
+                                {% elif annonce.type_annonce == 'vacances' %}background:#ef4444;
+                                {% else %}background:#f59e0b;{% endif %}
+                                padding: 4px 8px; border-radius: 4px; color: white; font-size: 12px;
+                            ">{{ annonce.get_type_annonce_display }}</span>
+                        </div>
+                        <p style="margin-top: 8px; color: #475569; font-size: 14.5px; line-height: 1.5;">{{ annonce.contenu }}</p>
+                        {% if annonce.date_evenement %}
+                            <p style="margin-top: 5px; font-size: 12px; color: var(--secondary); font-weight: bold;">
+                                <i class="far fa-calendar-alt"></i> Date de l'événement : {{ annonce.date_evenement|date:"d F Y" }}
+                            </p>
+                        {% endif %}
+                    </div>
+                {% empty %}
+                    <p style="color: #94a3b8; font-style: italic; font-size: 14.5px; margin: 0;">Aucune annonce affichée.</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Raccourcis rapides -->
+       <!-- Raccourcis rapides -->
+        <div class="card" style="padding: 20px; background: #fff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+            <h3 style="margin-top: 0; color: var(--dark); font-size: 18px;"><i class="fas fa-link" style="color: #64748b; margin-right: 10px;"></i> Raccourcis</h3>
+            <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 20px;">
+                <!-- Liens temporairement mis sur "#" pour éviter le NoReverseMatch -->
+                <a href="{% url 'mes_cours_eleve' %}" style="display: block; text-align: center; padding: 12px; background: #f1f5f9; color: #334155; border-radius: 6px; text-decoration: none; font-weight: 500; font-size: 14px; border: 1px solid #e2e8f0; transition: background 0.2s;">
+                    <i class="fas fa-book-open" style="margin-right: 8px; color: var(--primary);"></i> Consulter mes cours
+                </a>
+                <a href="{% url 'resultats_eleve' %}" style="display: block; text-align: center; padding: 12px; background: #f1f5f9; color: #334155; border-radius: 6px; text-decoration: none; font-weight: 500; font-size: 14px; border: 1px solid #e2e8f0; transition: background 0.2s;">
+                    <i class="fas fa-file-invoice" style="margin-right: 8px; color: var(--success);"></i> Voir mes résultats
+                </a>
+            </div>
+        </div>
 {% endblock %}

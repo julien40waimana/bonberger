@@ -23,12 +23,14 @@
             {% csrf_token %}
             <input type="hidden" name="action" value="attribuer_cours">
             
-            <div class="form-group">
-                <label>Enseignant Responsable</label>
-                <select name="professeur_id" required>
+           <div class="form-group">
+                <label for="professeur_id">Enseignant Responsable</label>
+                <select name="professeur_id" id="professeur_id" class="form-control" required>
                     <option value="">-- Choisir un professeur --</option>
                     {% for prof in professeurs %}
-                        <option value="{{ prof.id }}">Prof. {{ prof.last_name }} {{ prof.first_name }}</option>
+                        <option value="{{ prof.id }}">{{ prof.get_full_name|default:prof.username }}</option>
+                    {% empty %}
+                        <option value="" disabled>Aucun professeur disponible</option>
                     {% endfor %}
                 </select>
             </div>
