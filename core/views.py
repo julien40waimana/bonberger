@@ -27,14 +27,15 @@ def dashboard_aiguillage(request):
     role = request.user.role
     
     # 1. SI L'UTILISATEUR EST EN ATTENTE, ON LE PASSE AUTOMATIQUEMENT EN ÉLÈVE
-    if role == 'en_attente' or not role:
+    # 1. SI L'UTILISATEUR EST EN ATTENTE, ON LE PASSE AUTOMATIQUEMENT EN ÉLÈVE (Sauf si c'est le superadmin)
+    if not request.user.is_superuser and (role == 'en_attente' or not role):
         request.user.role = 'eleve'
         request.user.save()
-        role = 'eleve'  # Met à jour la variable pour la suite des conditions
+        role = 'eleve'
 
     # 2. LES REDIRECTIONS DIRECTES
     if request.user.is_superuser or role == 'superadmin':
-        return redirect('dashboard_superadmin')
+        return redirect('/admin') # Te renvoie directement sur le vrai panneau d'administration de Django
     elif role == 'prefet':
         return redirect('dashboard_prefet')
     elif role == 'professeur':
